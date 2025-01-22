@@ -1,5 +1,5 @@
 # Tygron AI Suite
-This is a simple package for training Mask R-CNN networks using datasets exported from the [Tygron Platform](www.tygron.com).
+This is a simple package for training [Mask R-CNN](https://pytorch.org/vision/main/models/mask_rcnn.html) networks using datasets exported from the [Tygron Platform](www.tygron.com).
 
 
 # Contents
@@ -7,7 +7,7 @@ This repository contains a few simple classes and functions for training a simpl
 
 The Configuration class stores the settings for:
 * The train and test dataset location
-* Mask RCNN model parameters:
+* Mask R-CNN model parameters:
  * Channels
 * Settings for exporting the PyTorch model to ONNX
 * Metadata that is interpreted by the Tygron Platform, such as:
