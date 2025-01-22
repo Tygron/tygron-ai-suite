@@ -241,7 +241,7 @@ class Configuration:
     def getFiles(self, train: bool = True):
 
         path = self.getTrainPath() if train else self.getTestPath()
-        files = listFilesRecursive(path)
+        files = listFilesRecursive(path, files=[])
         return sorted(files, key=lambda f: f.path)
 
 
