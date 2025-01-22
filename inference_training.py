@@ -256,20 +256,25 @@ class ImageDataset(torch.utils.data.Dataset):
         self.masks = [f.path for f in files if configuration.maskPredicate(f.path)]
         self.labels = [f.path for f in files if configuration.labelPredicate(f.path)]
 
+    def getAssetNumber(self, text: str):
+        prefix = self.configuration.filePrefix
+        if len(prefix) > 0 and text.startswith(prefix):
+            text = text[:len(prefix)]
+
+        return text.split("_")[0]
+
     def validateFiles(self, printFeedback: bool = False):
         valid = True
         for i in range(0, self.__len__()):
-            # get image index
-            imageName = self.images[i]
-            index = imageName.split("_")[1]
 
-            maskIndex = self.masks[i].split("_")[1]
+            index = self.getAssetNumber(self.images[i])
+            maskIndex = self.getAssetNumber(self.masks[i])
             if index != maskIndex:
                 valid = False
                 if printFeedback:
                     print("mask is missing for image " + self.images[i])
 
-            labelIndex = self.labels[i].split("_")[1]
+            labelIndex = self.getAssetNumber(self.labels[i])
             if index != labelIndex:
                 valid = False
                 if printFeedback:
