@@ -76,4 +76,4 @@ Call the shell script using ```bash -i anaconda.sh```
 * Adjust the following path variables:
   * trainDirectory = "PATH TO TRAIN FILES"
   * testDirectory = "PATH TO TEST FILES"
-* Press the "Restart kernal and execute all cells" button.
+* Press the "Restart kernel and execute all cells" button.
