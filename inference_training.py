@@ -1,6 +1,7 @@
 import os
 import onnx
 import torch
+from pathlib import Path
 import matplotlib.pyplot as pyplot
 import numpy as np
 import torchvision
@@ -159,8 +160,8 @@ class Configuration:
         return modelname
     
     def setDatasetPaths(self, trainPath: str, testPath: str):
-        self.trainPath = trainPath
-        self.testPath = testPath
+        self.trainPath = Path(trainPath)
+        self.testPath = Path(testPath)
 
     def getTrainPath(self):
         return self.trainPath
