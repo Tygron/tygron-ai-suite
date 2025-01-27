@@ -1,4 +1,5 @@
 import os
+import logging
 import onnx
 import torch
 from pathlib import Path
@@ -18,12 +19,12 @@ from torchvision.utils import draw_segmentation_masks, draw_bounding_boxes
 import utils
 from engine import train_one_epoch, evaluate
 
-
 # from torch.nn import Sequential,ModuleList
 # from torchvision.models.detection import maskrcnn_resnet50_fpn
 # from torchvision.models.detection.rpn import AnchorGenerator
 # from torchvision.ops import misc as misc_nn_ops
 
+logger = logging.getLogger(__name__)
 
 def initCudaEnvironment(numCudaDevices: int = 1,
                         visibleCudaDevices: str = "0",
@@ -142,6 +143,9 @@ class Configuration:
         self.cellSizeM = 0.25
         self.bboxPerImage = 250
         self.inferenceMode = 1
+        self.MAX_ERROR_COUNT = 10
+        self.MAX_CLASSES = 250
+        self.autoLimitLabel = False
 
     def setModelName(self, modelName: str):
         self._modelName = modelName
@@ -193,18 +197,21 @@ class Configuration:
     def getCellSizeCM(self):
         return str(int(self.cellSizeM*100)) + "cm"
 
-    def setVersion(self, version):
+    def setVersion(self, version: int):
         self.version = str(version)
 
-    def setEpochs(self, epochs):
+    def setEpochs(self, epochs: int):
         self.epochs = int(epochs)
+
+    def setAutoLimitLabel(self, autoLimit: bool):
+        self.autoLimitLabel = autoLimit
 
     def setTensorInfo(self, tensorName: str = "input_A:RGB_normalized",
                       batchAmount: int = 1):
         self.tensorName = str(tensorName)
         self.batchAmount = int(batchAmount)
 
-    def setModelInfo(self, 
+    def setModelInfo(self,
                      channels: int = 3,
                      numClasses: int = 2,
                      bboxOverlap: bool = True,
@@ -248,40 +255,23 @@ class Configuration:
 
 class ImageDataset(torch.utils.data.Dataset):
     def __init__(self, configuration: Configuration,
-                 isTraining: bool,
-                 transforms):
-        self.configuration = configuration
+                 isTraining: bool = True,
+                 transforms=None):
+
+        self.config = configuration
         self.transforms = transforms
+        self.isTraining = isTraining
         files = configuration.getFiles(isTraining)
         self.images = [f.path for f in files if configuration.imagePredicate(f.path)]
         self.masks = [f.path for f in files if configuration.maskPredicate(f.path)]
         self.labels = [f.path for f in files if configuration.labelPredicate(f.path)]
 
     def getAssetNumber(self, text: str):
-        prefix = self.configuration.filePrefix
+        prefix = self.config.filePrefix
         if len(prefix) > 0 and text.startswith(prefix):
             text = text[:len(prefix)]
 
         return text.split("_")[0]
-
-    def validateFiles(self, printFeedback: bool = False):
-        valid = True
-        for i in range(0, self.__len__()):
-
-            index = self.getAssetNumber(self.images[i])
-            maskIndex = self.getAssetNumber(self.masks[i])
-            if index != maskIndex:
-                valid = False
-                if printFeedback:
-                    print("mask is missing for image " + self.images[i])
-
-            labelIndex = self.getAssetNumber(self.labels[i])
-            if index != labelIndex:
-                valid = False
-                if printFeedback:
-                    print("labels are missing for image " + self.images[i])
-
-        return valid
 
     def getImage(self, idx):
         return read_image(self.images[idx], mode=ImageReadMode.RGB)[:3]
@@ -293,10 +283,19 @@ class ImageDataset(torch.utils.data.Dataset):
         return read_image(self.masks[idx], mode=ImageReadMode.GRAY)[0]
 
     def getLabelList(self, idx):
-        return getLabelList(self.getLabels(idx))
+        labelList = getLabelList(self.getLabels(idx))
+        if self.config.autoLimitLabel:
+            labelList = [min(x, self.config.numClasses) for x in labelList]
+        return labelList
 
     def getLabels(self, idx):
         return self.labels[idx]
+
+    def getMaxLabel(self):
+        maxLabel = 0
+        for i in range(self.__len__()):
+            maxLabel = max(maxLabel, max(self.getLabelList(i)))
+        return maxLabel
 
     def __getitem__(self, idx):
         # load images and masks
@@ -361,6 +360,59 @@ class ImageDataset(torch.utils.data.Dataset):
     def __len__(self):
         return min(len(self.images), len(self.masks), len(self.labels))
 
+    def getName(self):
+        return "Training dataset " if self.isTraining else "Test dataset"
+
+    def validate(self):
+        validFiles = self.validateFiles()
+        if validFiles:
+            logger.info("File check passed for " + self.getName())
+
+        validLabels = self.validateLabels()
+        if validLabels:
+            logger.info("Validation check passed for " + self.getName())
+
+        return validFiles and validLabels
+
+    def validateFiles(self):
+        errorCount = 0
+        for i in range(0, self.__len__()):
+
+            index = self.getAssetNumber(self.images[i])
+            maskIndex = self.getAssetNumber(self.masks[i])
+            if index != maskIndex:
+                errorCount += 1
+                if errorCount < self.config.MAX_ERROR_COUNT:
+                    logger.warning("mask is missing for image " + self.images[i])
+
+            labelIndex = self.getAssetNumber(self.labels[i])
+            if index != labelIndex:
+                errorCount += 1
+                if errorCount < self.config.MAX_ERROR_COUNT:
+                    logger.warning("labels are missing for image " + self.images[i])
+
+        return errorCount == 0
+
+    def validateLabels(self):
+
+        maxLabel = self.getMaxLabel()
+        valid = maxLabel <= self.config.numClasses
+
+        if not valid:
+            logger.warning("More classes found than expected: " +
+                                       str(maxLabel) + " vs " +
+                                       str(self.config.numClasses))
+
+            if maxLabel <= self.config.MAX_CLASSES:
+                logger.warning("Please adjust the numClasses to: " + str(maxLabel))
+                logger.warning("Or set the autoLimitLabel option of Configuration to True")
+
+            else:
+                logger.warning("Too many classes for sensible inferencing.")
+                logger.warning("Please set the autoLimitLabel option of Configuration to True")
+
+        return valid
+
 
 def listFilesRecursive(path, files=[]):
 
@@ -393,8 +445,13 @@ def trainModel(config: Configuration,
 
     if trainingDataLoader is None:
         if trainingDataset is None:
-            print("Please provide a training dataset or dataset loader")
+            logger.warning("Please provide a training dataset or dataset loader")
             return
+
+        elif not trainingDataset.validate():
+            logger.warning("Training dataset is invalid, please inspect the logs.")
+            return
+
         else:
             trainingDataLoader = torch.utils.data.DataLoader(
                 trainingDataset,
@@ -405,8 +462,12 @@ def trainModel(config: Configuration,
 
     if testDataLoader is None:
         if testDataset is None:
-            print("Please provide a test dataset or dataset loader")
+            logger.warning("Please provide a test dataset or dataset loader")
             return
+        elif not testDataset.validate():
+            logger.warning("Test dataset is invalid, please inspect the logs.")
+            return
+
         else:
             testDataLoader = torch.utils.data.DataLoader(
                 testDataset,
@@ -461,7 +522,7 @@ def createModelInstance(config: Configuration):
     model = torchvision.models.detection.maskrcnn_resnet50_fpn(weights="DEFAULT", 
                                                                box_detections_per_img=config.bboxPerImage)
 
-    print("Detections per image " + str(model.roi_heads.detections_per_img))
+    logger.info("Detections per image " + str(model.roi_heads.detections_per_img))
     # get number of input features for the classifier
     in_features = model.roi_heads.box_predictor.cls_score.in_features
 
@@ -470,7 +531,7 @@ def createModelInstance(config: Configuration):
 
     # now get the number of input features for the mask classifier
     in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
-    print("in features mask: " + str(in_features_mask))
+    logger.info("in features mask: " + str(in_features_mask))
 
     hidden_layer = 256
     # and replace the mask predictor with a new one
