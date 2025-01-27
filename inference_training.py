@@ -366,13 +366,17 @@ class ImageDataset(torch.utils.data.Dataset):
     def validate(self):
         validFiles = self.validateFiles()
         if validFiles:
-            logger.info("File check passed for " + self.getName())
+            logger.info("File presence validated for " + self.getName())
 
         validLabels = self.validateLabels()
         if validLabels:
-            logger.info("Validation check passed for " + self.getName())
+            logger.info("Labels validated for " + self.getName())
 
-        return validFiles and validLabels
+        validLength = self.__len__() <= 0
+        if validLength:
+            logger.warning("Dataset does not contain enough files. (" + str(self.__len__()) +")")
+
+        return validFiles and validLabels and validLength
 
     def validateFiles(self):
         errorCount = 0
