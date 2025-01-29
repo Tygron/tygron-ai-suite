@@ -87,21 +87,6 @@ def show(imgs, cols=3):
                                    xticks=[], yticks=[])
 
 
-def getLabels(filePrefix, imageNumber):
-    return getLabelList(filePrefix+imageNumber+"_labels.txt")
-
-
-def getLabelList(path):
-
-    lines = open(path, "r").read().splitlines()
-    result = []
-    for line in lines:
-        for value in line.split():
-            result.append(int(value))
-
-    return result
-
-
 def createTransforms(train: bool):
     transforms = []
 
@@ -282,19 +267,25 @@ class ImageDataset(torch.utils.data.Dataset):
     def getMask(self, idx):
         return read_image(self.masks[idx], mode=ImageReadMode.GRAY)[0]
 
-    def getLabelList(self, idx):
-        labelList = getLabelList(self.getLabels(idx))
-        if self.config.autoLimitLabel:
-            labelList = [min(x, self.config.numClasses) for x in labelList]
-        return labelList
-
     def getLabels(self, idx):
-        return self.labels[idx]
+
+        lines = open(self.labels[idx], "r").read().splitlines()
+        result = []
+
+        for line in lines:
+            for value in line.split():
+
+                intValue = int(value)
+                if self.config.autoLimitLabel:
+                    intValue = min(intValue, self.config.numClasses-1)
+
+                result.append(intValue)
+        return result
 
     def getMaxLabel(self):
         maxLabel = 0
         for i in range(self.__len__()):
-            maxLabel = max(maxLabel, max(self.getLabelList(i)))
+            maxLabel = max(maxLabel, max(self.getLabels(i)))
         return maxLabel
 
     def __getitem__(self, idx):
@@ -322,7 +313,7 @@ class ImageDataset(torch.utils.data.Dataset):
         # get bounding box coordinates for each mask
         boxes = masks_to_boxes(masks)
 
-        labels = self.getLabelList(idx)
+        labels = self.getLabels(idx)
         labels = torch.as_tensor(labels, dtype=torch.int64)
 
         boxArea = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
@@ -635,7 +626,7 @@ def drawImageAndFeatureMasks(config: Configuration,
 
     image = dataset.getImages(imageNumber)[0]
     mask = dataset.getMask(imageNumber)
-    labels = dataset.getLabelList(imageNumber)
+    labels = dataset.getLabels(imageNumber)
 
     masks = seperateMasks(mask)
 
