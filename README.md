@@ -68,6 +68,15 @@ anaconda-navigator
 ```
 Call the shell script using ```bash -i anaconda.sh```
 
+In case conda is not found (writing conda --version in command terminal also fails), use the following lines instead:
+```
+# Replace <PATH_TO_CONDA> with the path to your conda install
+source <PATH_TO_CONDA>/bin/activate
+conda init 
+anaconda-navigator
+```
+In case Anaconda was installed at /home/user/anaconda3, the <PATH_TO_CONDA> is /home/user/anaconda3/bin/conda
+
 # Getting Started
 
 * Export AI Datasets from Tygron Platform projects. Make sure you have a separated the folders containing train datasets and test datasets.
