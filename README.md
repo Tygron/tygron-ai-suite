@@ -32,8 +32,8 @@ Next, select the environments tab and in the bar below, select the option import
 
 When the import is completed, you can optionally select this environment as your default. In the upper left corner of the Anaconda-navigator app, select File > Preferences. For the option "Default conda environment" select tygronai.
 
-# Ubuntu shell script for starting anaconda-navigator
-To activate the environment and start anaconda-navigator using a simple shell script file, create one, for example named '''anaconda.sh''', with the following commands:
+# Ubuntu (linux) shell script for starting anaconda-navigator
+To activate the environment and start anaconda-navigator on linux using a simple shell script file, create one, for example named '''anaconda.sh''', with the following commands:
 ```
 conda init 
 anaconda-navigator
