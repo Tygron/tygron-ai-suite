@@ -24,7 +24,7 @@ The easiest way to get started is downloading and using anaconda. A conda enviro
 ## Anaconda
 [Download](https://www.anaconda.com/download/) Anaconda and install it to access conda and the anaconda-navigator.
 
-For Linux and Mac users, it might be required to follow the extra streps described at [[https://docs.anaconda.com/anaconda/install/]]
+For Linux and Mac users, it might be required to follow the extra steps described at (https://docs.anaconda.com/anaconda/install/)
 
 ## Import and setup environment automatically
 Once installed, open the Anaconda Navigator app. Once open, make sure the application is updated to the latest version. 
