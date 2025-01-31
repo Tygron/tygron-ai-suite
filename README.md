@@ -32,6 +32,18 @@ Next, select the environments tab and in the bar below, select the option import
 
 When the import is completed, you can optionally select this environment as your default. In the upper left corner of the Anaconda-navigator app, select File > Preferences. For the option "Default conda environment" select tygronai.
 
+# Getting Started
+
+* Export AI Datasets from Tygron Platform projects. Make sure you have a separated the folders containing train datasets and test datasets.
+* Start Anaconda Navigator.
+* Open the Jupyter Lab app (if necessary, install it first).
+* Go to local directory of this repository.
+* Open the example notebook named example_config.ipynb.
+* Adjust the following path variables:
+  * trainDirectory = "PATH TO TRAIN FILES"
+  * testDirectory = "PATH TO TEST FILES"
+* Press the "Restart kernel and execute all cells" button.
+
 # Ubuntu (linux) shell script for starting anaconda-navigator
 To activate the environment and start anaconda-navigator on linux using a simple shell script file, create one, for example named '''anaconda.sh''', with the following commands:
 ```
@@ -48,18 +60,6 @@ conda init
 anaconda-navigator
 ```
 In case Anaconda was installed at /home/user/anaconda3, the <PATH_TO_CONDA> is /home/user/anaconda3/bin/conda
-
-# Getting Started
-
-* Export AI Datasets from Tygron Platform projects. Make sure you have a separated the folders containing train datasets and test datasets.
-* Start Anaconda Navigator.
-* Open the Jupyter Lab app (if necessary, install it first).
-* Go to local directory of this repository.
-* Open the example notebook named example_config.ipynb.
-* Adjust the following path variables:
-  * trainDirectory = "PATH TO TRAIN FILES"
-  * testDirectory = "PATH TO TEST FILES"
-* Press the "Restart kernel and execute all cells" button.
 
 # Manual setup of a conda environment
 In case you want to manually setup the conda enviroment, for example when you want to combine it with an existing environment, follow the instructions below.
