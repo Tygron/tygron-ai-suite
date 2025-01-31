@@ -32,34 +32,6 @@ Next, select the environments tab and in the bar below, select the option import
 
 When the import is completed, you can optionally select this environment as your default. In the upper left corner of the Anaconda-navigator app, select File > Preferences. For the option "Default conda environment" select tygronai.
 
-## Manual setup of a conda environment
-In case you want to manually setup the conda enviroment, follow the instructions below.
-
-### Create conda enviroment
-```
-conda create --name tygronai python=3.11
-```
-Once create, activate itActivate it
-```
-conda activate tygronai
-````
-### Install pytorch and torchvision with cuda:
-In case you have a GPU that supports at least CUDA 12.1, you can run the conda install instructino below.
-```
-conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
-```
-For alternative versions of pytorch, such as the cpu only version, please refer to the [official instructions](https://pytorch.org/get-started/locally/)
-
-### Install onnx and onnxruntime
-To import a trained neural network into the Tygron Platform, it needs to be exported from [PyTorch to ONNX](https://pytorch.org/docs/stable/onnx.html). The following packages need to be installed.
-```
-conda install onnx onnxruntime
-```
-### Install onnxscript
-```
-pip install onnxscript
-```
-
 # Ubuntu shell script for starting anaconda-navigator
 To activate the environment and start anaconda-navigator using a simple shell script file, create one, for example named '''anaconda.sh''', with the following commands:
 ```
@@ -88,3 +60,31 @@ In case Anaconda was installed at /home/user/anaconda3, the <PATH_TO_CONDA> is /
   * trainDirectory = "PATH TO TRAIN FILES"
   * testDirectory = "PATH TO TEST FILES"
 * Press the "Restart kernel and execute all cells" button.
+
+# Manual setup of a conda environment
+In case you want to manually setup the conda enviroment, for example when you want to combine it with an existing environment, follow the instructions below.
+
+## Create conda enviroment
+```
+conda create --name tygronai python=3.11
+```
+Once create, activate itActivate it
+```
+conda activate tygronai
+````
+## Install pytorch and torchvision with cuda:
+In case you have a GPU that supports at least CUDA 12.1, you can run the conda install instructino below.
+```
+conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+```
+For alternative versions of pytorch, such as the cpu only version, please refer to the [official instructions](https://pytorch.org/get-started/locally/)
+
+## Install onnx and onnxruntime
+To import a trained neural network into the Tygron Platform, it needs to be exported from [PyTorch to ONNX](https://pytorch.org/docs/stable/onnx.html). The following packages need to be installed.
+```
+conda install onnx onnxruntime
+```
+## Install onnxscript
+```
+pip install onnxscript
+```
