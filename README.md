@@ -27,7 +27,9 @@ The easiest way to get started is downloading and using anaconda. A conda enviro
 For Linux and Mac users, it might be required to follow the extra steps described at (https://docs.anaconda.com/anaconda/install/)
 
 ## Import and setup environment automatically
-Once installed, open the Anaconda Navigator app. Once open, make sure the application is updated to the latest version. 
+Once installed, open the Anaconda Navigator app. In case you have trouble starting it up on Linux, follow [these instructions](#ubuntu-linux-shell-script-for-starting-anaconda-navigator)
+
+Once open, make sure the application is updated to the latest version. 
 Next, select the environments tab and in the bar below, select the option import an environment from a local file. Select the tygronai.yml file provided by this repository. Please note that importing this environment may take a while.
 
 When the import is completed, you can optionally select this environment as your default. In the upper left corner of the Anaconda-navigator app, select File > Preferences. For the option "Default conda environment" select tygronai.
