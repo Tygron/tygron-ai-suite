@@ -1,18 +1,17 @@
 name: tygronai
 channels:
   - pytorch
-  - nvidia
   - defaults
 dependencies:
   - python=3.11
-  - pytorch
-  - pytorch-cuda=12.1
-  - torchaudio
-  - torchvision
-  - onnx
-  - onnxruntime
   - pip
-  - matplotlib
   - pip:
+    - torch 
+    - torchvision 
+    - torchaudio
     - onnxscript
     - pycocotools
+    - onnx
+    - onnxruntime
+    - matplotlib
+    - jupyterlab
