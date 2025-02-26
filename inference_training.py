@@ -17,6 +17,7 @@ from torchvision.ops.boxes import masks_to_boxes
 from torchvision.transforms import v2
 from torchvision.utils import draw_segmentation_masks, draw_bounding_boxes
 import utils
+import datetime
 from engine import train_one_epoch, evaluate
 
 # from torch.nn import Sequential,ModuleList
@@ -72,12 +73,11 @@ def show(imgs, cols=3):
     if len(imgs) % cols > 0:
         rows += 1
 
-    pyplot.figure(figsize=(32, 16))
-
     if not isinstance(imgs, list):
         imgs = [imgs]
-    fig, axs = pyplot.subplots(nrows=rows, ncols=cols,
-                               squeeze=False, figsize=(32, 16))
+    
+    fig, axs = pyplot.subplots(nrows=rows, ncols=cols, squeeze=False,layout='compressed',
+                               figsize=(100,100))
 
     for i, img in enumerate(imgs):
         img = img.detach()
@@ -131,6 +131,8 @@ class Configuration:
         self.MAX_ERROR_COUNT = 10
         self.MAX_CLASSES = 250
         self.autoLimitLabel = False
+
+        self.version = datetime.date.today().strftime("%Y%m%d")
 
     def setModelName(self, modelName: str):
         self._modelName = modelName
@@ -230,14 +232,7 @@ class Configuration:
         self.scoreThreshold = scoreThreshold
         self.maskThreshold = maskThreshold
         self.strideFraction = strideFraction
-
-    def getFiles(self, train: bool = True):
-
-        path = self.getTrainPath() if train else self.getTestPath()
-        files = listFilesRecursive(path, files=[])
-        return sorted(files, key=lambda f: f.path)
-
-
+    
 class ImageDataset(torch.utils.data.Dataset):
     def __init__(self, configuration: Configuration,
                  isTraining: bool = True,
@@ -246,11 +241,27 @@ class ImageDataset(torch.utils.data.Dataset):
         self.config = configuration
         self.transforms = transforms
         self.isTraining = isTraining
-        files = configuration.getFiles(isTraining)
-        self.images = [f.path for f in files if configuration.imagePredicate(f.path)]
-        self.masks = [f.path for f in files if configuration.maskPredicate(f.path)]
-        self.labels = [f.path for f in files if configuration.labelPredicate(f.path)]
+        self.images = []
+        self.masks = []
+        self.labels = []
 
+        try:
+            files = self.getFiles()
+            self.images = [f.path for f in files if configuration.imagePredicate(f.path)]
+            self.masks = [f.path for f in files if configuration.maskPredicate(f.path)]
+            self.labels = [f.path for f in files if configuration.labelPredicate(f.path)]
+        except FileNotFoundError:
+            logger.warning("The datasets directory does not exist: "+str(self.getDirectory()))
+            logger.warning("Please adjust the configured dataset directory in the configuration file!")
+
+
+    def getDirectory(self):
+        return self.config.getTrainPath() if self.isTraining else self.config.getTestPath()
+    
+    def getFiles(self):
+        files = listFilesRecursive(self.getDirectory(), files=[])
+        return sorted(files, key=lambda f: f.path)
+        
     def getAssetNumber(self, text: str):
         prefix = self.config.filePrefix
         if len(prefix) > 0 and text.startswith(prefix):
@@ -285,7 +296,8 @@ class ImageDataset(torch.utils.data.Dataset):
     def getMaxLabel(self):
         maxLabel = 0
         for i in range(self.__len__()):
-            maxLabel = max(maxLabel, max(self.getLabels(i)))
+            if len(self.getLabels(i)) > 0:
+                maxLabel = max(maxLabel, max(self.getLabels(i)))
         return maxLabel
 
     def __getitem__(self, idx):
@@ -352,9 +364,14 @@ class ImageDataset(torch.utils.data.Dataset):
         return min(len(self.images), len(self.masks), len(self.labels))
 
     def getName(self):
-        return "Training dataset " if self.isTraining else "Test dataset"
+        return "Training dataset" if self.isTraining else "Test dataset"
 
     def validate(self):
+        
+        if self.__len__() <= 0:
+            logger.warning("No files were found in the " + self.getName())
+            return False    
+        
         validFiles = self.validateFiles()
         if validFiles:
             logger.info("File check passed for " + self.getName())
@@ -395,11 +412,11 @@ class ImageDataset(torch.utils.data.Dataset):
                                        str(self.config.numClasses))
 
             if maxLabel <= self.config.MAX_CLASSES:
-                logger.warning("Please adjust the numClasses to: " + str(maxLabel))
+                logger.warning("Please adjust the Configuration parameter numClasses to: " + str(maxLabel))
                 logger.warning("Or set the autoLimitLabel option of Configuration to True")
 
             else:
-                logger.warning("Too many classes for sensible inferencing.")
+                logger.warning("More classes are defined in the label files than the trained model can handle.")
                 logger.warning("Please set the autoLimitLabel option of Configuration to True")
 
         return valid

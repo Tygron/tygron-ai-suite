@@ -76,7 +76,6 @@ def createTestConfiguration() -> Configuration:
     config.setModelName("configmodel")
     config.setInputSizes(inputWidth=250, inputHeight=250)
     config.setInputCellSize(cellSizeM=0.25, minCellSizeM=0.1, maxCellSizeM=0.5)
-    config.setVersion(0)
 
     config.setModelInfo(channels=3, numClasses=5+1,  # (1 + background)
                         bboxOverlap=True, bboxPerImage=250, reuseModel=False)
