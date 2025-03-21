@@ -131,6 +131,7 @@ class Configuration:
         self.MAX_ERROR_COUNT = 10
         self.MAX_CLASSES = 250
         self.autoLimitLabel = False
+        self.isCrowd = True
 
         self.version = datetime.date.today().strftime("%Y%m%d")
 
@@ -192,6 +193,9 @@ class Configuration:
 
     def setAutoLimitLabel(self, autoLimit: bool):
         self.autoLimitLabel = autoLimit
+
+    def setIsCrowd(self, isCrowd: bool):
+        self.isCrowd = isCrowd
 
     def setTensorInfo(self, tensorName: str = "input_A:RGB_normalized",
                       batchAmount: int = 1):
@@ -332,7 +336,7 @@ class ImageDataset(torch.utils.data.Dataset):
         area = torch.as_tensor(boxArea, dtype=torch.int64)
 
         # suppose all instances are crowd
-        iscrowd = torch.ones(num_objs, dtype=torch.int64)
+        iscrowd = torch.ones(num_objs, dtype=torch.int64) if config.isCrowd() else torch.zeros(num_objs, dtype=torch.int64)
 
         # Wrap sample and targets into torchvision tv_tensors:
         for i in range(0, len(imgs)):
