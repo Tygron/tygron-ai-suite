@@ -336,7 +336,7 @@ class ImageDataset(torch.utils.data.Dataset):
         area = torch.as_tensor(boxArea, dtype=torch.int64)
 
         # suppose all instances are crowd
-        iscrowd = torch.ones(num_objs, dtype=torch.int64) if config.isCrowd() else torch.zeros(num_objs, dtype=torch.int64)
+        iscrowd = torch.ones(num_objs, dtype=torch.int64) if self.config.isCrowd else torch.zeros(num_objs, dtype=torch.int64)
 
         # Wrap sample and targets into torchvision tv_tensors:
         for i in range(0, len(imgs)):
