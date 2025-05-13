@@ -240,10 +240,11 @@ class Configuration:
 class ImageDataset(torch.utils.data.Dataset):
     def __init__(self, configuration: Configuration,
                  isTraining: bool = True,
-                 transforms=None):
+                 transforms=None, imageTransforms=None):
 
         self.config = configuration
         self.transforms = transforms
+        self.imageTransforms = imageTransforms
         self.isTraining = isTraining
         self.images = []
         self.masks = []
@@ -349,6 +350,10 @@ class ImageDataset(torch.utils.data.Dataset):
                                                    canvas_size=v2.functional.get_size(imgs[0]))
         target["masks"] = tensorMasks
 
+		if self.imageTransforms is not None:
+			for i in range(0, len(imgs)):
+                imgs[i] = self.imageTransforms(imgs[i])
+
         if self.transforms is not None:
             for i in range(0, len(imgs)):
                 imgs[i] = self.transforms(imgs[i])
@@ -369,6 +374,22 @@ class ImageDataset(torch.utils.data.Dataset):
 
     def getName(self):
         return "Training dataset" if self.isTraining else "Test dataset"
+		
+	# get transforms applied to both image and target (masks etc)
+    def getTransforms(self):
+		return self.transforms
+	
+	# get transforms only applied to images (not masks)
+    def getImageTransforms(self):
+		return self.imageTransforms	
+
+	# set transforms applied to both image and target (masks etc)
+    def setTransforms(self, transforms):
+		self.transforms = transforms
+	
+	# set transforms only applied to images (not masks)
+    def setImageTransforms(self, imageTransforms):
+		self.imageTransforms = imageTransforms
 
     def validate(self):
         
