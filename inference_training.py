@@ -350,8 +350,8 @@ class ImageDataset(torch.utils.data.Dataset):
                                                    canvas_size=v2.functional.get_size(imgs[0]))
         target["masks"] = tensorMasks
 
-		if self.imageTransforms is not None:
-			for i in range(0, len(imgs)):
+        if self.imageTransforms is not None:
+            for i in range(0, len(imgs)):
                 imgs[i] = self.imageTransforms(imgs[i])
 
         if self.transforms is not None:
@@ -377,19 +377,19 @@ class ImageDataset(torch.utils.data.Dataset):
 		
 	# get transforms applied to both image and target (masks etc)
     def getTransforms(self):
-		return self.transforms
+        return self.transforms
 	
 	# get transforms only applied to images (not masks)
     def getImageTransforms(self):
-		return self.imageTransforms	
+        return self.imageTransforms	
 
 	# set transforms applied to both image and target (masks etc)
     def setTransforms(self, transforms):
-		self.transforms = transforms
+        self.transforms = transforms
 	
 	# set transforms only applied to images (not masks)
     def setImageTransforms(self, imageTransforms):
-		self.imageTransforms = imageTransforms
+        self.imageTransforms = imageTransforms
 
     def validate(self):
         
@@ -668,6 +668,19 @@ def drawImageAndFeatureMasks(config: Configuration,
 
     image = dataset.getImages(imageNumber)[0]
     mask = dataset.getMask(imageNumber)
+    labels = dataset.getLabels(imageNumber)
+
+    masks = seperateMasks(mask)
+
+    showMasks(image, masks, labels)
+    showBBoxes(image, masks)
+    
+def drawTransformedImageAndFeatureMasks(config: Configuration,
+                             dataset: ImageDataset,
+                             imageNumber: int):
+    itemTuple = dataset.__getitem__(imageNumber)
+    image = itemTuple[0]
+    mask = itemTuple[1]["masks"]
     labels = dataset.getLabels(imageNumber)
 
     masks = seperateMasks(mask)
