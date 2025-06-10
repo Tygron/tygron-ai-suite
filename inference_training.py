@@ -131,7 +131,7 @@ class Configuration:
         self.MAX_ERROR_COUNT = 10
         self.MAX_CLASSES = 250
         self.autoLimitLabel = False
-        self.isCrowd = True
+        self.isCrowd = False
 
         self.version = datetime.date.today().strftime("%Y%m%d")
 
