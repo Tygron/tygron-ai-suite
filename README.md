@@ -61,7 +61,7 @@ jupyter notebook
   * testDirectory = "PATH TO TEST FILES"
 * Press the "Restart kernel and execute all cells" button.
 
-# Ubuntu (linux) shell script for starting anaconda-navigator
+# Ubuntu (linux) shell script for starting conda
 To activate the tygronai environment and start jupyter notebook app in your browser on linux using a simple shell script file, create one, for example named '''miniforge.sh''', with the following commands:
 ```
 conda init 
@@ -74,9 +74,10 @@ In case conda is not found (writing conda --version in command terminal also fai
 ```
 # Replace <PATH_TO_CONDA> with the path to your conda install
 source <PATH_TO_CONDA>/bin/activate
-conda init 
-anaconda-navigator
+conda init
+conda activate tygronai
+jupyter notebook
 ```
-In case Anaconda was installed at /home/user/anaconda3, the <PATH_TO_CONDA> is /home/user/anaconda3/bin/conda
+In case Miniforge was installed at /home/user/miniforge3, then <PATH_TO_CONDA> is /home/user/miniforge3
 
 
