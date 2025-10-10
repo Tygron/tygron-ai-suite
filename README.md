@@ -21,7 +21,7 @@ It also has a dataset class that simplifies training based on the data generated
 # Installation
 To get started, first download this tygron-ai-suite repository on your computer. Either use 
 ```
-git clone
+git clone https://github.com/Tygron/tygron-ai-suite.git
 ```
 or download the repository as a zip and unzin it on your pc. 
 
