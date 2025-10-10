@@ -79,5 +79,11 @@ conda activate tygronai
 jupyter notebook
 ```
 In case Miniforge was installed at /home/user/miniforge3, then <PATH_TO_CONDA> is /home/user/miniforge3
+To open jupyter notebook in a specific directory, for example the directory of the tygron ai suite repository, add a change directory line above the jupyter notebook line, and replace <PATH_TO_TYGRON_AI_SUITE> with the specific directory:
+
+```
+cd <PATH_TO_TYGRON_AI_SUITE>
+jupyter notebook
+```
 
 
