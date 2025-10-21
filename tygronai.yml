@@ -7,12 +7,12 @@ dependencies:
   - pip
   - pip:
     - --extra-index-url https://download.pytorch.org/whl/cu126    
-    - torch 
-    - torchvision 
-    - torchaudio
-    - onnxscript
-    - pycocotools
-    - onnx
-    - onnxruntime
     - matplotlib
     - notebook
+    - pycocotools
+    - torch<2.9
+    - torchvision<=2.9
+    - torchaudio<=2.9
+    - onnxscript==0.5.4
+    - onnx==1.16
+    - onnxruntime==1.18
