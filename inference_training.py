@@ -740,7 +740,7 @@ def toNumpy(tensor):
     return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
 
 
-def exportOnnxModel(config: Configuration, model, opsetVersion=11):
+def exportOnnxModel(config: Configuration, model, opsetVersion=18):
     device = torch.device('cpu')
     onnx_input = createOnnxInput(config)
     model.to(device)
