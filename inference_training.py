@@ -740,7 +740,7 @@ def toNumpy(tensor):
     return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
 
 
-def exportOnnxModel(config: Configuration, model):
+def exportOnnxModel(config: Configuration, model, opsetVersion=11):
     device = torch.device('cpu')
     onnx_input = createOnnxInput(config)
     model.to(device)
@@ -751,11 +751,12 @@ def exportOnnxModel(config: Configuration, model):
                   onnx_input,                # model input (or a tuple for multiple inputs)
                   config.getOnnxFileName(),  # where to save the model (can be a file or file-like object)
                   export_params=True,        # store the trained parameter weights inside the model file
-                  opset_version=11,          # the ONNX version to export the model to
+                  opset_version=opsetVersion,          # the ONNX version to export the model to
                   do_constant_folding=True,  # whether to execute constant folding for optimization
                   input_names = [config.tensorName],   # the model's input names
                   output_names = ['boxes', 'labels','scores','masks'],) # the model's output names)
 
+    
     model.to(config.device)
     model.eval()
 
