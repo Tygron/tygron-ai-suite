@@ -86,4 +86,14 @@ cd <PATH_TO_TYGRON_AI_SUITE>
 jupyter notebook
 ```
 
+# Troubleshooting
 
+### TorchExportError: Failed to export the model with torch.export
+A known cause for this error is a mismatch in versions between pip packages and the AI suite. To resolve, recreate the used conda environment using the versioned .yml file.
+
+```
+conda deactivate
+conda env remove -n tygronai
+conda env create -n tygronai -f tygronai-versioned.yml
+conda activate tygronai
+```
