@@ -39,7 +39,7 @@ By default, conda opens with a base environment. To setup a new conda environmen
 
 Next, automatically setup a tygronai environment by typing:
 ```
-conda env create -n tygronai -f tygronai.yml
+conda env create -n tygronai -f tygronai_12_4.yml
 ```
 This creates an enviroment named tygronai using the dependencies listed in the tygronai.yml file. Once the enviroment is set up, you can activate it by typing:
 ```
@@ -89,11 +89,11 @@ jupyter notebook
 # Troubleshooting
 
 ### TorchExportError: Failed to export the model with torch.export
-A known cause for this error is a mismatch in versions between pip packages and the AI suite. To resolve, recreate the used conda environment using the versioned .yml file.
+A known cause for this error is a mismatch in versions between pip packages and the AI suite. To resolve, recreate the used conda environment using the correctly versioned .yml file. The following instructions can be used to remove and recreate an environment.
 
 ```
 conda deactivate
 conda env remove -n tygronai
-conda env create -n tygronai -f tygronai-versioned.yml
+conda env create -n tygronai -f tygronai_12_4.yml.yml
 conda activate tygronai
 ```
