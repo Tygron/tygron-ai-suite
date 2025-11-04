@@ -84,16 +84,5 @@ To open jupyter notebook in a specific directory, for example the directory of t
 ```
 cd <PATH_TO_TYGRON_AI_SUITE>
 jupyter notebook
-```
 
-# Troubleshooting
 
-### TorchExportError: Failed to export the model with torch.export
-A known cause for this error is a mismatch in versions between pip packages and the AI suite. To resolve, recreate the used conda environment using the correctly versioned .yml file. The following instructions can be used to remove and recreate an environment.
-
-```
-conda deactivate
-conda env remove -n tygronai
-conda env create -n tygronai -f tygronai_12_4.yml.yml
-conda activate tygronai
-```
