@@ -39,7 +39,7 @@ By default, conda opens with a base environment. To setup a new conda environmen
 
 Next, automatically setup a tygronai environment by typing:
 ```
-conda env create -n tygronai -f tygronai_12_4.yml
+conda env create -n tygronai -f tygronai.yml
 ```
 This creates an enviroment named tygronai using the dependencies listed in the tygronai.yml file. Once the enviroment is set up, you can activate it by typing:
 ```
