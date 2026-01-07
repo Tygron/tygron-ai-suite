@@ -16,9 +16,9 @@ import torch.nn as nn
 from torchvision.ops.boxes import masks_to_boxes
 from torchvision.transforms import v2
 from torchvision.utils import draw_segmentation_masks, draw_bounding_boxes
-import utils
+import pytorch.utils as utils
 import datetime
-from engine import train_one_epoch, evaluate
+from pytorch.engine import train_one_epoch, evaluate
 
 # from torch.nn import Sequential,ModuleList
 # from torchvision.models.detection import maskrcnn_resnet50_fpn
