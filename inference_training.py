@@ -26,6 +26,7 @@ from pytorch.engine import train_one_epoch, evaluate
 # from torchvision.ops import misc as misc_nn_ops
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 def initCudaEnvironment(numCudaDevices: int = 1,
                         visibleCudaDevices: str = "0",
@@ -680,12 +681,12 @@ def drawTransformedImageAndFeatureMasks(config: Configuration,
     showMasks(image, masks, labels)
     showBBoxes(image, masks)
 
-def inspectImage(dataset: ImageDataset, imageNumber: int):
+def inspectImage(config: Configuration, dataset: ImageDataset, imageNumber: int):
 
     imgIndex = abs(imageNumber)%dataset.size();
-    logger.info("Amount of labels in image "+ str(imgIndex) + " : " + trainingDataset.getLabels(imgIndex))
-    if(len(trainingDataset.getLabels(imgIndex))>0):
-        drawImageAndFeatureMasks(config, trainingDataset, imgIndex)
+    logger.info("Amount of labels in image "+ str(imgIndex) + " : " + str(dataset.getLabels(imgIndex)))
+    if(len(dataset.getLabels(imgIndex))>0):
+        drawImageAndFeatureMasks(config, dataset, imgIndex)
     else:
         logger.warning("Image "+str(imgIndex) + " has no labeled features");
 
