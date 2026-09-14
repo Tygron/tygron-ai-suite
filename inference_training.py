@@ -391,6 +391,9 @@ class ImageDataset(torch.utils.data.Dataset):
     def setImageTransforms(self, imageTransforms):
         self.imageTransforms = imageTransforms
 
+    def size(self):
+        return self.__len__()
+
     def validate(self):
         
         if self.__len__() <= 0:
@@ -671,6 +674,14 @@ def drawTransformedImageAndFeatureMasks(config: Configuration,
     showMasks(image, masks, labels)
     showBBoxes(image, masks)
 
+def inspectImage(dataset: ImageDataset, imageNumber: int):
+
+    imgIndex = abs(imageNumber)%dataset.size();
+    logger.info("Amount of labels in image "+ str(imgIndex) + " : " + trainingDataset.getLabels(imgIndex))
+    if(len(trainingDataset.getLabels(imgIndex))>0):
+        drawImageAndFeatureMasks(config, trainingDataset, imgIndex)
+    else:
+        logger.warning("Image "+str(imgIndex) + " has no labeled features");
 
 def testInference(config: Configuration,
                   dataset: ImageDataset, model,
