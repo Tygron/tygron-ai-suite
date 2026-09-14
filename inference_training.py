@@ -552,7 +552,7 @@ def trainModel(config: Configuration,
 def createModelInstance(config: Configuration):
 
     # load an instance segmentation model pre-trained on COCO
-    model = torchvision.models.detection.maskrcnn_resnet50_fpn_v2(num_classes=config.numClasses,
+    model = torchvision.models.detection.maskrcnn_resnet50_fpn(num_classes=config.numClasses,
                                                                box_detections_per_img=config.bboxPerImage)
 
     
