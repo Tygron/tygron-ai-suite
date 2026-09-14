@@ -552,27 +552,10 @@ def trainModel(config: Configuration,
 def createModelInstance(config: Configuration):
 
     # load an instance segmentation model pre-trained on COCO
-    model = torchvision.models.detection.maskrcnn_resnet50_fpn(weights="DEFAULT", 
+    model = torchvision.models.detection.maskrcnn_resnet50_fpn_v2(num_classes=config.numClasses,
                                                                box_detections_per_img=config.bboxPerImage)
 
-    logger.info("Detections per image " + str(model.roi_heads.detections_per_img))
-    # get number of input features for the classifier
-    in_features = model.roi_heads.box_predictor.cls_score.in_features
-
-    # replace the pre-trained head with a new one
-    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, config.numClasses)
-
-    # now get the number of input features for the mask classifier
-    in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
-    logger.info("in features mask: " + str(in_features_mask))
-
-    hidden_layer = 256
-    # and replace the mask predictor with a new one
-    model.roi_heads.mask_predictor = MaskRCNNPredictor(
-        in_features_mask,
-        hidden_layer,
-        config.numClasses
-    )
+    
 
     # move model to the right device
     model = model.to(config.device)
@@ -751,8 +734,8 @@ def exportOnnxModel(config: Configuration, model, opsetVersion=18):
                   onnx_input,                # model input (or a tuple for multiple inputs)
                   config.getOnnxFileName(),  # where to save the model (can be a file or file-like object)
                   export_params=True,        # store the trained parameter weights inside the model file
+                  dynamo=False,
                   opset_version=opsetVersion,          # the ONNX version to export the model to
-                  do_constant_folding=True,  # whether to execute constant folding for optimization
                   input_names = [config.tensorName],   # the model's input names
                   output_names = ['boxes', 'labels','scores','masks'],) # the model's output names)
 
