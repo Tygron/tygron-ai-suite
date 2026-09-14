@@ -27,6 +27,7 @@ from pytorch.engine import train_one_epoch, evaluate
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
 
 def initCudaEnvironment(numCudaDevices: int = 1,
                         visibleCudaDevices: str = "0",
