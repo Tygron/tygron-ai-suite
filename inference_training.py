@@ -449,6 +449,12 @@ class ImageDataset(torch.utils.data.Dataset):
 
         return valid
 
+def defaultTrainDataset(config):
+    return ImageDataset(config, True, createTransforms(True))
+
+def defaultTestDataset(config):
+    return ImageDataset(config, False, createTransforms(False))
+    
 
 def listFilesRecursive(path, files=[]):
 
